@@ -1,147 +1,169 @@
-'use client'
-import { useCallback, useEffect, useState } from 'react'
-import { createClient } from '@/utils/supabase/client'
-import { type User } from '@supabase/supabase-js'
+"use client";
+import { useCallback, useEffect, useState } from "react";
+import { createClient } from "@/utils/supabase/client";
+import { type User } from "@supabase/supabase-js";
 
 // ...
 
 export default function AccountForm({ user }: { user: User | null }) {
-  const supabase = createClient()
-  const [loading, setLoading] = useState(true)
-  const [fullname, setFullname] = useState<string | null>(null)
-  const [username, setUsername] = useState<string | null>(null)
-  const [website, setWebsite] = useState<string | null>(null)
-  const [avatar_url, setAvatarUrl] = useState<string | null>(null)
+  const supabase = createClient();
+  const [loading, setLoading] = useState(true);
+  const [fullname, setFullname] = useState<string | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
+  const [website, setWebsite] = useState<string | null>(null);
+  const [avatar_url, setAvatarUrl] = useState<string | null>(null);
 
   const getProfile = useCallback(async () => {
     try {
-      setLoading(true)
+      setLoading(true);
 
       const { data, error, status } = await supabase
-        .from('profiles')
+        .from("profiles")
         .select(`full_name, username, website, avatar_url`)
-        .eq('id', user?.id)
-        .single()
+        .eq("id", user?.id)
+        .single();
 
       if (error && status !== 406) {
-        console.log(error)
-        throw error
+        console.log(error);
+        throw error;
       }
 
       if (data) {
-        setFullname(data.full_name)
-        setUsername(data.username)
-        setWebsite(data.website)
-        setAvatarUrl(data.avatar_url)
+        setFullname(data.full_name);
+        setUsername(data.username);
+        setWebsite(data.website);
+        setAvatarUrl(data.avatar_url);
       }
     } catch (error) {
-      console.log(error)
-      alert('Error loading user data!')
+      console.log(error);
+      alert("Error loading user data!");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [user, supabase])
+  }, [user, supabase]);
 
   useEffect(() => {
-    getProfile()
-  }, [user, getProfile])
+    getProfile();
+  }, [user, getProfile]);
 
   async function updateProfile({
     username,
     website,
     avatar_url,
   }: {
-    username: string | null
-    fullname: string | null
-    website: string | null
-    avatar_url: string | null
+    username: string | null;
+    fullname: string | null;
+    website: string | null;
+    avatar_url: string | null;
   }) {
     try {
-      setLoading(true)
+      setLoading(true);
 
-      const { error } = await supabase.from('profiles').upsert({
+      const { error } = await supabase.from("profiles").upsert({
         id: user?.id as string,
         full_name: fullname,
         username,
         website,
         avatar_url,
         updated_at: new Date().toISOString(),
-      })
-      if (error) throw error
-      alert('Profile updated!')
+      });
+      if (error) throw error;
+      alert("Profile updated!");
     } catch (error) {
-      console.log(error)
-      alert('Error updating the data!')
+      console.log(error);
+      alert("Error updating the data!");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-10">
-      <h1 className="text-3xl font-bold text-foreground mb-8 text-center">
+    <div className="mx-auto max-w-3xl px-4 pt-10 sm:px-6 lg:px-8">
+      <h1 className="mb-8 text-center text-3xl font-bold text-foreground">
         Mon Profil
       </h1>
-      
-      <div className="bg-card text-card-foreground rounded-lg shadow-lg p-6 space-y-6">
+
+      <div className="space-y-6 rounded-lg bg-card p-6 text-card-foreground shadow-lg">
         <div className="space-y-2">
-          <label htmlFor="email" className="text-sm font-medium text-foreground">Email</label>
-          <input 
-            id="email" 
-            type="text" 
-            value={user?.email} 
-            disabled 
-            className="w-full px-3 py-2 bg-muted text-muted-foreground rounded-md"
+          <label
+            htmlFor="email"
+            className="text-sm font-medium text-foreground"
+          >
+            Email
+          </label>
+          <input
+            id="email"
+            type="text"
+            value={user?.email}
+            disabled
+            className="w-full rounded-md bg-muted px-3 py-2 text-muted-foreground"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="fullName" className="text-sm font-medium text-foreground">Nom complet</label>
+          <label
+            htmlFor="fullName"
+            className="text-sm font-medium text-foreground"
+          >
+            Nom complet
+          </label>
           <input
             id="fullName"
             type="text"
-            value={fullname || ''}
+            value={fullname || ""}
             onChange={(e) => setFullname(e.target.value)}
-            className="w-full px-3 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="username" className="text-sm font-medium text-foreground">Nom d&apos;utilisateur</label>
+          <label
+            htmlFor="username"
+            className="text-sm font-medium text-foreground"
+          >
+            Nom d&apos;utilisateur
+          </label>
           <input
             id="username"
             type="text"
-            value={username || ''}
+            value={username || ""}
             onChange={(e) => setUsername(e.target.value)}
-            className="w-full px-3 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
         <div className="space-y-2">
-          <label htmlFor="website" className="text-sm font-medium text-foreground">Site web</label>
+          <label
+            htmlFor="website"
+            className="text-sm font-medium text-foreground"
+          >
+            Site web
+          </label>
           <input
             id="website"
             type="url"
-            value={website || ''}
+            value={website || ""}
             onChange={(e) => setWebsite(e.target.value)}
-            className="w-full px-3 py-2 border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-md border border-input bg-background px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>
 
         <div className="pt-4">
           <button
-            className="w-full px-8 py-3 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors"
-            onClick={() => updateProfile({ fullname, username, website, avatar_url })}
+            className="w-full rounded-full bg-primary px-8 py-3 text-primary-foreground transition-colors hover:bg-primary/90"
+            onClick={() =>
+              updateProfile({ fullname, username, website, avatar_url })
+            }
             disabled={loading}
           >
-            {loading ? 'Chargement...' : 'Mettre à jour'}
+            {loading ? "Chargement..." : "Mettre à jour"}
           </button>
         </div>
 
         <div className="pt-2">
           <form action="/auth/signout" method="post">
-            <button 
-              className="w-full px-8 py-3 bg-secondary text-secondary-foreground rounded-full hover:bg-secondary/80 transition-colors"
+            <button
+              className="w-full rounded-full bg-secondary px-8 py-3 text-secondary-foreground transition-colors hover:bg-secondary/80"
               type="submit"
             >
               Se déconnecter
@@ -150,5 +172,5 @@ export default function AccountForm({ user }: { user: User | null }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
